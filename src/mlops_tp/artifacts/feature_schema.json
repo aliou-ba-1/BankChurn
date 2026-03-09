@@ -1,0 +1,25 @@
+{
+    "numeric_features": [
+        "CreditScore",
+        "Age",
+        "Tenure",
+        "Balance",
+        "NumOfProducts",
+        "HasCrCard",
+        "IsActiveMember",
+        "EstimatedSalary"
+    ],
+    "categorical_features": [
+        "Geography",
+        "Gender"
+    ],
+    "engineered_features": [
+        "BalanceSalaryRatio",
+        "AgeNumProducts",
+        "CreditScorePerAge",
+        "HasZeroBalance",
+        "TenurePerAge",
+        "InactiveWithCard"
+    ],
+    "optimal_threshold": 0.4276194468409144
+}
