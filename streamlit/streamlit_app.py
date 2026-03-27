@@ -4,11 +4,12 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import json
+import os
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000").rstrip("/")
 
 st.set_page_config(
     page_title="🏦 Bank Churn Prediction",

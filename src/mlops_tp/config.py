@@ -1,9 +1,13 @@
 from pathlib import Path
 
 # Chemin
-ROOT_DIR = Path(__file__).resolve()  # chemin vers le fichier actuel (config.py)
-while not (ROOT_DIR / "README.md").exists():
-    ROOT_DIR = ROOT_DIR.parent # .parent permet de remonter d'un dossier à chaque fois que la condition n'est pas vérifiée, c-à-d absence du README.MD dans ROOT_DIR
+ROOT_DIR = Path(__file__).resolve().parent
+while not (ROOT_DIR / "README.md").exists() and ROOT_DIR != ROOT_DIR.parent:
+    ROOT_DIR = ROOT_DIR.parent
+
+# Fallback robuste (ex: image Docker sans README.md)
+if not (ROOT_DIR / "README.md").exists():
+    ROOT_DIR = Path(__file__).resolve().parents[2]
 
 ARTIFACTS_DIR = ROOT_DIR/"src"/"mlops_tp"/"artifacts"   # Chemin vers le dossier artifacts
 DATA_DIR = ROOT_DIR / "data"

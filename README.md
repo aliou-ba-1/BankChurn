@@ -69,7 +69,8 @@ BankChurn/
 │   ├── test_api.py                  # Tests de l'API
 │   ├── test_inference.py            # Tests d'inférence
 │   └── test_training.py             # Tests d'entraînement
-├── streamlit_app.py                 # Interface utilisateur Streamlit
+├── streamlit/
+│   └── streamlit_app.py            # Interface utilisateur Streamlit
 ├── requirements.txt                 # Dépendances Python
 └── README.md
 ```
@@ -184,12 +185,44 @@ uvicorn src.mlops_tp.api:app --reload
 ### 3. Lancer l'interface Streamlit
 
 ```bash
-streamlit run streamlit_app.py
+streamlit run streamlit/streamlit_app.py
 ```
 
 - 🖥️ Interface : [http://localhost:8501](http://localhost:8501)
 
 > ⚠️ L'API FastAPI doit être lancée **avant** l'application Streamlit.
+
+---
+
+## 🐳 Conteneurisation (Docker)
+
+### Prérequis
+
+- Docker
+- Docker Compose (plugin `docker compose`)
+
+### Lancer les services
+
+```bash
+docker compose up --build
+```
+
+Services disponibles :
+- API FastAPI : `http://localhost:8000`
+- Streamlit : `http://localhost:8501`
+
+### Vérifier la santé des conteneurs
+
+```bash
+docker compose ps
+curl http://localhost:8000/health
+```
+
+### Arrêter les services
+
+```bash
+docker compose down
+```
 
 ---
 

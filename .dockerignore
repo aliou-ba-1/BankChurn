@@ -1,0 +1,32 @@
+# VCS
+.git
+.gitignore
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Local outputs and notebooks
+notebooks/
+*.ipynb
+
+# Tests and docs not needed at runtime
+tests/
+README.md
+
+# OS files
+.DS_Store
+
