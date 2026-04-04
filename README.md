@@ -1,245 +1,143 @@
-# 🏦 Bank Churn Prediction — TP MLOps
+# BankChurn - Prediction de churn bancaire
 
-> Prédiction du désabonnement des clients bancaires avec un pipeline MLOps complet : entraînement, API REST et interface interactive.
+Application MLOps de classification binaire pour predire le desabonnement client (`Exited`) avec:
+- un pipeline d'entrainement scikit-learn,
+- une API REST FastAPI,
+- une interface Streamlit,
+- un suivi d'experiences MLflow.
 
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.30+-FF4B4B?logo=streamlit&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3+-F7931E?logo=scikit-learn&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-1.5+-150458?logo=pandas&logoColor=white)
+[![UI Render](https://img.shields.io/badge/UI-Render-46E3B7?logo=render&logoColor=white)](https://bankchurn-ui.onrender.com)
+[![API Render](https://img.shields.io/badge/API-Render-46E3B7?logo=render&logoColor=white)](https://bankchurn-1-982n.onrender.com)
+[![Docs](https://img.shields.io/badge/API-Docs-blue)](https://bankchurn-1-982n.onrender.com/docs)
 
----
+## Vue d'ensemble
 
-## 📋 Contexte métier
+- **Cible**: `Exited` (`0` = fidele, `1` = churn)
+- **Donnees**: `data/Churn_Modelling.csv`
+- **Modele**: Gradient Boosting + preprocessing + option SMOTE
+- **Endpoints API**: `/health`, `/metadata`, `/predict`, `/predict/batch`
+- **UI**: `streamlit/streamlit_app.py`
 
-Le taux de désabonnement (*churn*) est un indicateur clé pour les banques : acquérir un nouveau client coûte **beaucoup plus cher** que de fidéliser un client existant.
+## Acces production (Render)
 
-Ce projet analyse les caractéristiques démographiques et les comportements financiers des clients afin de **prédire lesquels risquent de quitter la banque**, permettant de proposer proactivement des services personnalisés pour améliorer la fidélisation.
+- UI Streamlit: `https://bankchurn-ui.onrender.com`
+- API FastAPI: `https://bankchurn-1-982n.onrender.com`
+- API docs: `https://bankchurn-1-982n.onrender.com/docs`
+- API health: `https://bankchurn-1-982n.onrender.com/health`
 
----
+> La section **Demarrage rapide (local)** est reservee a une execution en local.
 
-## 🎯 Tâche ML
+## Architecture du projet
 
-**Classification binaire** sur la variable `Exited` :
-
-| Valeur | Signification |
-|--------|---------------|
-| `0`    | Client fidèle ✅ |
-| `1`    | Client perdu ❌ |
-
----
-
-## 📊 Données
-
-**Source** : [Kaggle — Bank Customer Churn Prediction](https://www.kaggle.com/datasets/chetanmittal033/bank-dataset-for-customer-churn-prediction)
-
-| Caractéristique | Détail |
-|---|---|
-| Fichier | `Churn_Modelling.csv` |
-| Lignes | 10 000 |
-| Colonnes | 14 |
-| Variables numériques | `CreditScore`, `Age`, `Tenure`, `Balance`, `NumOfProducts`, `HasCrCard`, `IsActiveMember`, `EstimatedSalary` |
-| Variables catégorielles | `Geography`, `Gender` |
-| Variable cible | `Exited` (0 ou 1) |
-| Valeurs manquantes | Aucune |
-| Déséquilibre de classe | 80 % fidèles / 20 % perdus |
-
----
-
-## 🏗️ Architecture du projet
-
-```
+```text
 BankChurn/
 ├── data/
-│   └── Churn_Modelling.csv          # Dataset brut
-├── notebooks/
-│   └── EDA_Churn_Modelling.ipynb    # Analyse exploratoire
+│   ├── Churn_Modelling.csv
+│   └── batch_test_15.csv
 ├── src/mlops_tp/
-│   ├── config.py                    # Configuration centralisée (chemins, hyperparamètres)
-│   ├── train.py                     # Entraînement + feature engineering + évaluation
-│   ├── inference.py                 # Chargement du modèle et prédictions
-│   ├── api.py                       # API REST FastAPI
-│   ├── schemas.py                   # Schémas Pydantic (validation entrées/sorties)
+│   ├── api.py
+│   ├── config.py
+│   ├── inference.py
+│   ├── schemas.py
+│   ├── train.py
 │   └── artifacts/
-│       ├── model.joblib             # Modèle sérialisé
-│       ├── metrics.json             # Métriques d'évaluation
-│       ├── feature_schema.json      # Schéma des features attendues
-│       └── run_info.json            # Informations sur le dernier entraînement
-├── tests/
-│   ├── test_api.py                  # Tests de l'API
-│   ├── test_inference.py            # Tests d'inférence
-│   └── test_training.py             # Tests d'entraînement
+│       ├── model.joblib
+│       ├── metrics.json
+│       ├── feature_schema.json
+│       └── run_info.json
 ├── streamlit/
-│   └── streamlit_app.py            # Interface utilisateur Streamlit
-├── requirements.txt                 # Dépendances Python
+│   ├── Dockerfile
+│   └── streamlit_app.py
+├── tests/
+│   ├── test_api.py
+│   ├── test_inference.py
+│   └── test_training.py
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
 └── README.md
 ```
 
----
-
-## 🔬 Pipeline ML
-
-### Feature Engineering
-
-6 features supplémentaires sont créées pour enrichir le modèle :
-
-| Feature | Description |
-|---------|-------------|
-| `BalanceSalaryRatio` | Ratio solde / salaire estimé (capacité d'épargne) |
-| `AgeNumProducts` | Âge × nombre de produits (interaction) |
-| `CreditScorePerAge` | Score de crédit normalisé par l'âge |
-| `HasZeroBalance` | Indicateur binaire de solde nul |
-| `TenurePerAge` | Ancienneté relative à l'âge |
-| `InactiveWithCard` | Client inactif possédant une carte de crédit |
-
-### Modèle
-
-| Élément | Choix |
-|---------|-------|
-| Algorithme | **GradientBoostingClassifier** |
-| Rééquilibrage | **SMOTE** (ratio 0.8) |
-| Prétraitement | `StandardScaler` (numériques) + `OneHotEncoder` (catégorielles) |
-| Split | 70 % train / 15 % validation / 15 % test |
-
-### Hyperparamètres
-
-| Paramètre | Valeur |
-|-----------|--------|
-| `n_estimators` | 300 |
-| `learning_rate` | 0.05 |
-| `max_depth` | 5 |
-| `min_samples_split` | 10 |
-| `min_samples_leaf` | 4 |
-| `subsample` | 0.8 |
-
----
-
-## 📈 Résultats
-
-### Validation
-
-| Métrique | Score |
-|----------|-------|
-| **Accuracy** | 86.3 % |
-| **F1-Score** (weighted) | 86.2 % |
-| **AUC-ROC** | 88.5 % |
-| Precision (churn) | 67.4 % |
-| Recall (churn) | 64.1 % |
-
-### Test
-
-| Métrique | Score |
-|----------|-------|
-| **Accuracy** | 84.8 % |
-| **F1-Score** (weighted) | 84.9 % |
-| **AUC-ROC** | 86.1 % |
-| Precision (churn) | 62.2 % |
-| Recall (churn) | 64.3 % |
-
----
-
-## 🚀 Installation
-
-### Prérequis
+## Prerequis
 
 - Python 3.10+
-- pip
+- `pip`
+- Optionnel: Docker + Docker Compose
 
-### Étapes
+## Installation locale
 
 ```bash
-# 1. Cloner le dépôt
 git clone <url-du-repo>
 cd BankChurn
-
-# 2. Créer un environnement virtuel (recommandé)
 python -m venv .venv
-source .venv/bin/activate        # macOS / Linux
-# .venv\Scripts\activate         # Windows
-
-# 3. Installer les dépendances
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
----
+## Demarrage rapide (local)
 
-## ▶️ Utilisation
-
-### 1. Entraîner le modèle
+1. Entrainer (ou mettre a jour) les artefacts:
 
 ```bash
 python -m src.mlops_tp.train
 ```
 
-Les artifacts (modèle, métriques, schéma) seront sauvegardés dans `src/mlops_tp/artifacts/`.
-
-### 2. Lancer l'API FastAPI
+2. Lancer l'API:
 
 ```bash
 uvicorn src.mlops_tp.api:app --reload
 ```
 
-- 🌐 API : [http://localhost:8000](http://localhost:8000)
-- 📖 Documentation Swagger : [http://localhost:8000/docs](http://localhost:8000/docs)
-
-### 3. Lancer l'interface Streamlit
+3. Lancer Streamlit:
 
 ```bash
 streamlit run streamlit/streamlit_app.py
 ```
 
-- 🖥️ Interface : [http://localhost:8501](http://localhost:8501)
+Acces local:
+- API: `http://localhost:8000`
+- OpenAPI: `http://localhost:8000/docs`
+- Streamlit: `http://localhost:8501`
 
-> ⚠️ L'API FastAPI doit être lancée **avant** l'application Streamlit.
-
----
-
-## 🐳 Conteneurisation (Docker)
-
-### Prérequis
-
-- Docker
-- Docker Compose (plugin `docker compose`)
-
-### Lancer les services
+## Lancement avec Docker Compose
 
 ```bash
 docker compose up --build
 ```
 
-Services disponibles :
-- API FastAPI : `http://localhost:8000`
-- Streamlit : `http://localhost:8501`
+Services exposes:
+- API: `http://localhost:8000`
+- Streamlit: `http://localhost:8501`
 
-### Vérifier la santé des conteneurs
+Arret:
+
+```bash
+docker compose down
+```
+
+Verification:
 
 ```bash
 docker compose ps
 curl http://localhost:8000/health
 ```
 
-### Arrêter les services
+## Utilisation de l'API
+
+### Endpoints
+
+- `GET /` : message de bienvenue
+- `GET /health` : etat API + modele charge
+- `GET /metadata` : version, type de tache, features, date d'entrainement
+- `POST /predict` : prediction unitaire
+- `POST /predict/batch` : prediction batch
+
+### Exemple `POST /predict`
 
 ```bash
-docker compose down
-```
+API_BASE_URL=http://localhost:8000
 
----
-
-## 🔌 Endpoints de l'API
-
-| Méthode | Route | Description |
-|---------|-------|-------------|
-| `GET` | `/` | Message de bienvenue |
-| `GET` | `/health` | État de santé de l'API et du modèle |
-| `GET` | `/metadata` | Métadonnées du modèle (version, métriques) |
-| `POST` | `/predict` | Prédiction unitaire |
-| `POST` | `/predict/batch` | Prédiction par lot |
-
-### Exemple de requête
-
-```bash
-curl -X POST http://localhost:8000/predict \
+curl -X POST "$API_BASE_URL/predict" \
   -H "Content-Type: application/json" \
   -d '{
     "features": {
@@ -257,62 +155,108 @@ curl -X POST http://localhost:8000/predict \
   }'
 ```
 
----
+Pour la production Render:
 
-## 🧪 Tests
+```bash
+API_BASE_URL=https://bankchurn-1-982n.onrender.com
+```
+
+### Exemple `POST /predict/batch`
+
+```bash
+curl -X POST "$API_BASE_URL/predict/batch" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "instances": [
+      {
+        "CreditScore": 619,
+        "Geography": "France",
+        "Gender": "Female",
+        "Age": 42,
+        "Tenure": 2,
+        "Balance": 0.0,
+        "NumOfProducts": 1,
+        "HasCrCard": 1,
+        "IsActiveMember": 1,
+        "EstimatedSalary": 101348.88
+      }
+    ]
+  }'
+```
+
+## Interface Streamlit
+
+Fichier: `streamlit/streamlit_app.py`
+
+Variable d'environnement supportee:
+- `API_URL` (defaut: `https://bankchurn-1-982n.onrender.com`)
+
+Forcer une API locale:
+
+```bash
+export API_URL=http://localhost:8000
+streamlit run streamlit/streamlit_app.py
+```
+
+## Variables d'environnement
+
+### Entrainement / MLflow (`src/mlops_tp/config.py`)
+
+- `MLFLOW_ENABLED` (defaut: `true`)
+- `MLFLOW_TRACKING_URI` (defaut: `file:./mlruns`)
+- `MLFLOW_EXPERIMENT_NAME` (defaut: `BankChurn`)
+- `MLFLOW_RUN_NAME_PREFIX` (defaut: `train`)
+
+Exemple:
+
+```bash
+export MLFLOW_ENABLED=true
+export MLFLOW_TRACKING_URI=file:./mlruns
+export MLFLOW_EXPERIMENT_NAME=BankChurn
+export MLFLOW_RUN_NAME_PREFIX=train
+python -m src.mlops_tp.train
+```
+
+## Tests
+
+Lancer tous les tests:
 
 ```bash
 pytest tests/ -v
 ```
 
----
+Fichiers principaux:
+- `tests/test_training.py`
+- `tests/test_inference.py`
+- `tests/test_api.py`
 
-## 📈 Suivi des expériences avec MLflow
+## Troubleshooting
 
-Le script d'entraînement intègre maintenant un tracking MLflow (paramètres, métriques, modèle, artifacts).
+- **Erreur `Model not loaded` sur l'API**
+  - Verifier que les artefacts existent dans `src/mlops_tp/artifacts/`.
+  - Reexecuter: `python -m src.mlops_tp.train`.
 
-### Configuration (optionnelle)
+- **Streamlit ne joint pas l'API locale**
+  - Verifier `API_URL`.
+  - En local: `export API_URL=http://localhost:8000` avant `streamlit run ...`.
 
-Variables d'environnement supportées :
+- **Erreur 422 sur `/predict` ou `/predict/batch`**
+  - Verifier les noms de colonnes et les types d'entree.
+  - Comparer avec les exemples `curl` et la doc `/docs`.
 
-- `MLFLOW_ENABLED` (défaut: `true`)
-- `MLFLOW_TRACKING_URI` (défaut: `file:./mlruns`)
-- `MLFLOW_EXPERIMENT_NAME` (défaut: `BankChurn`)
-- `MLFLOW_RUN_NAME_PREFIX` (défaut: `train`)
+- **Port deja utilise**
+  - API: `8000`, Streamlit: `8501`.
+  - Changer les ports ou arreter le process qui bloque.
 
-### Exemple d'utilisation
+## Stack technique
 
-```bash
-# 1) Entraîner et logger un run MLflow
-python -m src.mlops_tp.train
+- `pandas`, `numpy`
+- `scikit-learn`, `imbalanced-learn`
+- `FastAPI`, `Pydantic`, `uvicorn`
+- `Streamlit`, `plotly`
+- `MLflow`
+- `pytest`
 
-# 2) Ouvrir l'interface MLflow UI
-mlflow ui --backend-store-uri ./mlruns --port 5001
-```
+## Licence
 
-Interface MLflow : [http://localhost:5001](http://localhost:5001)
-
-> Les artifacts locaux (`model.joblib`, `metrics.json`, etc.) sont conservés pour rester compatibles avec l'API FastAPI et l'inférence existantes.
-
----
-
-## 🛠️ Stack technique
-
-| Outil | Rôle |
-|-------|------|
-| **pandas** | Manipulation des données |
-| **scikit-learn** | Pipeline ML, prétraitement, modèle |
-| **imbalanced-learn** | SMOTE (rééquilibrage des classes) |
-| **FastAPI** | API REST de prédiction |
-| **Pydantic** | Validation des données d'entrée/sortie |
-| **Streamlit** | Interface utilisateur interactive |
-| **MLflow** | Tracking des expériences (params, métriques, artifacts, modèle) |
-| **Plotly** | Visualisations interactives |
-| **pytest** | Tests unitaires et d'intégration |
-
----
-
-## 📜 Licence
-
-**CC0 : Public Domain** — Libre d'utilisation sans restriction.
-# BankChurn
+CC0 - Public Domain
