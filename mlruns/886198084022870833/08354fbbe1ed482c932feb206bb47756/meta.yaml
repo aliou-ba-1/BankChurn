@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/aliouba/Documents/GitHub/BankChurn/mlruns/886198084022870833/08354fbbe1ed482c932feb206bb47756/artifacts
+end_time: 1775302065378
+entry_point_name: ''
+experiment_id: '886198084022870833'
+lifecycle_stage: active
+run_id: 08354fbbe1ed482c932feb206bb47756
+run_name: train-20260404-132738
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1775302058892
+status: 3
+tags: []
+user_id: aliouba

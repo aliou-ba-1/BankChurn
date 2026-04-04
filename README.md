@@ -267,6 +267,35 @@ pytest tests/ -v
 
 ---
 
+## 📈 Suivi des expériences avec MLflow
+
+Le script d'entraînement intègre maintenant un tracking MLflow (paramètres, métriques, modèle, artifacts).
+
+### Configuration (optionnelle)
+
+Variables d'environnement supportées :
+
+- `MLFLOW_ENABLED` (défaut: `true`)
+- `MLFLOW_TRACKING_URI` (défaut: `file:./mlruns`)
+- `MLFLOW_EXPERIMENT_NAME` (défaut: `BankChurn`)
+- `MLFLOW_RUN_NAME_PREFIX` (défaut: `train`)
+
+### Exemple d'utilisation
+
+```bash
+# 1) Entraîner et logger un run MLflow
+python -m src.mlops_tp.train
+
+# 2) Ouvrir l'interface MLflow UI
+mlflow ui --backend-store-uri ./mlruns --port 5001
+```
+
+Interface MLflow : [http://localhost:5001](http://localhost:5001)
+
+> Les artifacts locaux (`model.joblib`, `metrics.json`, etc.) sont conservés pour rester compatibles avec l'API FastAPI et l'inférence existantes.
+
+---
+
 ## 🛠️ Stack technique
 
 | Outil | Rôle |
@@ -277,6 +306,7 @@ pytest tests/ -v
 | **FastAPI** | API REST de prédiction |
 | **Pydantic** | Validation des données d'entrée/sortie |
 | **Streamlit** | Interface utilisateur interactive |
+| **MLflow** | Tracking des expériences (params, métriques, artifacts, modèle) |
 | **Plotly** | Visualisations interactives |
 | **pytest** | Tests unitaires et d'intégration |
 

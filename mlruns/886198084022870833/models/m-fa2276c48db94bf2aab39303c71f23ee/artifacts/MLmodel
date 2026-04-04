@@ -1,0 +1,23 @@
+artifact_path: file:///Users/aliouba/Documents/GitHub/BankChurn/mlruns/886198084022870833/models/m-fa2276c48db94bf2aab39303c71f23ee/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.11.1
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+mlflow_version: 3.10.1
+model_id: m-fa2276c48db94bf2aab39303c71f23ee
+model_size_bytes: 1480423
+model_uuid: m-fa2276c48db94bf2aab39303c71f23ee
+prompts: null
+run_id: 08354fbbe1ed482c932feb206bb47756
+utc_time_created: '2026-04-04 11:27:39.051137'

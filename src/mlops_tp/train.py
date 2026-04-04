@@ -3,6 +3,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -17,7 +18,8 @@ from src.mlops_tp.config import (
     DATA_FILE, TARGET_COLUMN, TRAIN_SIZE, VALIDATION_SIZE, TEST_SIZE, RANDOM_SEED,
     N_ESTIMATORS, LEARNING_RATE, MAX_DEPTH, MIN_SAMPLES_SPLIT, MIN_SAMPLES_LEAF,
     SUBSAMPLE, USE_SMOTE, SMOTE_RATIO,
-    TASK_TYPE, METRICS_PATH, NUM_VAR, CAT_VAR, MODEL_PATH, SCHEMA_PATH, RUN_INFO_PATH
+    TASK_TYPE, METRICS_PATH, NUM_VAR, CAT_VAR, MODEL_PATH, SCHEMA_PATH, RUN_INFO_PATH,
+    MLFLOW_ENABLED, MLFLOW_TRACKING_URI, MLFLOW_EXPERIMENT_NAME, MLFLOW_RUN_NAME_PREFIX
 )
 
 
@@ -259,6 +261,90 @@ def save_artifacts(model, metrics, X_train, optimal_threshold=0.5):
         json.dump(run_info, f, indent=4)
     print(f"Run info saved to {RUN_INFO_PATH}")
 
+
+def log_to_mlflow(model, metrics: dict):
+    """Loggue les paramètres, métriques, modèle et artifacts dans MLflow (optionnel)."""
+    if not MLFLOW_ENABLED:
+        print("MLflow logging disabled (MLFLOW_ENABLED=false).")
+        return None
+
+    try:
+        import mlflow
+        import mlflow.sklearn
+    except ImportError:
+        print("MLflow is not installed. Skipping MLflow logging.")
+        return None
+
+    try:
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        mlflow.set_experiment(MLFLOW_EXPERIMENT_NAME)
+        run_name = f"{MLFLOW_RUN_NAME_PREFIX}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+
+        with mlflow.start_run(run_name=run_name) as run:
+            hyperparams = metrics.get("Hyperparameters", {})
+            if hyperparams:
+                mlflow.log_params(hyperparams)
+
+            mlflow.log_param("task_type", TASK_TYPE)
+
+            validation_metrics = metrics.get("Validation", {})
+            test_metrics = metrics.get("Test", {})
+
+            mlflow_metrics = {
+                "val_accuracy": validation_metrics.get("accuracy", 0.0),
+                "val_f1_weighted": validation_metrics.get("f1_score", 0.0),
+                "val_roc_auc": validation_metrics.get("roc_auc", 0.0),
+                "test_accuracy": test_metrics.get("accuracy", 0.0),
+                "test_f1_weighted": test_metrics.get("f1_score", 0.0),
+                "test_roc_auc": test_metrics.get("roc_auc", 0.0),
+            }
+
+            val_churn = validation_metrics.get("classification_report", {}).get("1", {})
+            test_churn = test_metrics.get("classification_report", {}).get("1", {})
+            if val_churn:
+                mlflow_metrics["val_churn_precision"] = val_churn.get("precision", 0.0)
+                mlflow_metrics["val_churn_recall"] = val_churn.get("recall", 0.0)
+                mlflow_metrics["val_churn_f1"] = val_churn.get("f1-score", 0.0)
+            if test_churn:
+                mlflow_metrics["test_churn_precision"] = test_churn.get("precision", 0.0)
+                mlflow_metrics["test_churn_recall"] = test_churn.get("recall", 0.0)
+                mlflow_metrics["test_churn_f1"] = test_churn.get("f1-score", 0.0)
+
+            mlflow.log_metrics(mlflow_metrics)
+            mlflow.sklearn.log_model(model, artifact_path="model")
+
+            for artifact in [METRICS_PATH, SCHEMA_PATH, MODEL_PATH, RUN_INFO_PATH]:
+                artifact_path = Path(artifact)
+                if artifact_path.exists():
+                    mlflow.log_artifact(str(artifact_path), artifact_path="artifacts")
+
+            run_meta = {
+                "run_id": run.info.run_id,
+                "experiment_id": run.info.experiment_id,
+                "tracking_uri": MLFLOW_TRACKING_URI,
+            }
+            print(f"MLflow run logged: {run_meta['run_id']}")
+            return run_meta
+    except Exception as e:
+        print(f"MLflow logging failed: {e}")
+        return None
+
+
+def update_run_info_with_mlflow(run_meta: dict | None):
+    """Ajoute les métadonnées MLflow dans run_info.json si disponibles."""
+    if not run_meta or not RUN_INFO_PATH.exists():
+        return
+
+    try:
+        with open(RUN_INFO_PATH, 'r') as f:
+            run_info = json.load(f)
+        run_info["mlflow"] = run_meta
+        with open(RUN_INFO_PATH, 'w') as f:
+            json.dump(run_info, f, indent=4)
+        print("Run info updated with MLflow metadata.")
+    except Exception as e:
+        print(f"Could not update run_info with MLflow metadata: {e}")
+
 #=============================================================================================
 # FONCTION PRINCIPALE
 #=============================================================================================
@@ -307,6 +393,12 @@ def main():
     # Sauvegarde des artifacts
     print("\nSaving artifacts...")
     save_artifacts(pipeline, metrics, X_train, optimal_threshold=optimal_threshold)
+
+    # Tracking MLflow (optionnel)
+    print("\nLogging run to MLflow...")
+    mlflow_run_meta = log_to_mlflow(pipeline, metrics)
+    update_run_info_with_mlflow(mlflow_run_meta)
+
     print("\nEntrainement terminé avec succès. Artifacts saved.")
 
 if __name__ == "__main__":

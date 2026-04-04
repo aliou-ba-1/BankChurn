@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Chemin
@@ -47,3 +48,10 @@ METRICS_PATH = ARTIFACTS_DIR / "metrics.json"
 SCHEMA_PATH = ARTIFACTS_DIR / "feature_schema.json"
 RUN_INFO_PATH = ARTIFACTS_DIR / "run_info.json"
 MODEL_VERSION = "0.2.0"
+
+# MLflow
+MLFLOW_ENABLED = os.getenv("MLFLOW_ENABLED", "true").lower() in {"1", "true", "yes", "on"}
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", f"file:{ROOT_DIR / 'mlruns'}")
+MLFLOW_EXPERIMENT_NAME = os.getenv("MLFLOW_EXPERIMENT_NAME", "BankChurn")
+MLFLOW_RUN_NAME_PREFIX = os.getenv("MLFLOW_RUN_NAME_PREFIX", "train")
+

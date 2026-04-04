@@ -1,0 +1,10 @@
+artifact_location: file:///Users/aliouba/Documents/GitHub/BankChurn/mlruns/886198084022870833/models/m-fa2276c48db94bf2aab39303c71f23ee/artifacts
+creation_timestamp: 1775302058955
+experiment_id: '886198084022870833'
+last_updated_timestamp: 1775302065359
+model_id: m-fa2276c48db94bf2aab39303c71f23ee
+model_type: null
+name: model
+source_run_id: 08354fbbe1ed482c932feb206bb47756
+status: 2
+status_message: null

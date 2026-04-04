@@ -1,0 +1,19 @@
+{
+    "timestamp": "2026-04-04T13:27:36.904659",
+    "hyperparameters": {
+        "model_type": "GradientBoosting",
+        "n_estimators": 300,
+        "learning_rate": 0.05,
+        "max_depth": 5,
+        "min_samples_split": 10,
+        "min_samples_leaf": 4,
+        "subsample": 0.8,
+        "use_smote": true,
+        "smote_ratio": 0.8,
+        "optimal_threshold": 0.4276194468409144,
+        "random_state": 42
+    },
+    "metrics_path": "/Users/aliouba/Documents/GitHub/BankChurn/src/mlops_tp/artifacts/metrics.json",
+    "model_path": "/Users/aliouba/Documents/GitHub/BankChurn/src/mlops_tp/artifacts/model.joblib",
+    "schema_path": "/Users/aliouba/Documents/GitHub/BankChurn/src/mlops_tp/artifacts/feature_schema.json"
+}
