@@ -9,7 +9,7 @@ import os
 # ============================================================
 # CONFIGURATION
 # ============================================================
-API_URL = os.getenv("API_URL", "http://localhost:8000").rstrip("/")
+API_URL = os.getenv("API_URL", "https://bankchurn-1-982n.onrender.com").rstrip("/")
 
 st.set_page_config(
     page_title="🏦 Bank Churn Prediction",
