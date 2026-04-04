@@ -1,0 +1,16 @@
+RowNumber,CustomerId,Surname,CreditScore,Geography,Gender,Age,Tenure,Balance,NumOfProducts,HasCrCard,IsActiveMember,EstimatedSalary,Exited
+3560,15727353,Ch'ang,650,France,Female,64,7,142028.36,1,1,0,32275.09,1
+2549,15617197,Chien,524,France,Male,50,4,0.0,2,1,1,31840.59,1
+2158,15750649,Uwakwe,744,France,Female,44,3,0.0,2,1,1,189016.14,0
+7788,15675963,Padovano,627,France,Female,57,9,0.0,2,1,1,107712.42,0
+3289,15807837,Mazzanti,640,France,Female,30,6,107499.7,1,1,1,187632.22,0
+6794,15611669,Nyhan,623,Germany,Male,50,7,126608.37,1,0,1,645.61,1
+2843,15785782,Ugonna,513,Spain,Male,48,2,0.0,1,1,1,114709.13,1
+4564,15694376,Sullivan,705,Germany,Female,64,3,153469.26,3,0,0,146573.66,1
+2456,15727490,Scott,661,France,Male,47,5,0.0,1,0,1,107243.31,1
+1619,15662955,Nicholls,697,France,Male,27,8,141223.68,2,1,0,90591.15,0
+1634,15755868,Farmer,562,France,Male,35,7,0.0,1,0,0,48869.67,0
+8166,15813503,Pickering,606,Spain,Male,37,8,154712.58,2,1,0,89099.18,0
+6410,15690695,Flynn,683,France,Female,33,9,0.0,2,1,1,38784.42,0
+2531,15598086,Brown,624,France,Female,45,3,68639.57,1,1,0,168002.31,1
+544,15705953,Kodilinyechukwu,721,Spain,Male,51,0,169312.13,1,1,0,109078.35,1
