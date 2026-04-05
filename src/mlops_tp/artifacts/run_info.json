@@ -1,5 +1,5 @@
 {
-    "timestamp": "2026-04-04T13:27:36.904659",
+    "timestamp": "2026-04-05T20:24:30.046060",
     "hyperparameters": {
         "model_type": "GradientBoosting",
         "n_estimators": 300,
@@ -17,8 +17,8 @@
     "model_path": "/Users/aliouba/Documents/GitHub/BankChurn/src/mlops_tp/artifacts/model.joblib",
     "schema_path": "/Users/aliouba/Documents/GitHub/BankChurn/src/mlops_tp/artifacts/feature_schema.json",
     "mlflow": {
-        "run_id": "08354fbbe1ed482c932feb206bb47756",
-        "experiment_id": "886198084022870833",
-        "tracking_uri": "file:/Users/aliouba/Documents/GitHub/BankChurn/mlruns"
+        "run_id": "a258e968400a42c094a074f2c373c61f",
+        "experiment_id": "1",
+        "tracking_uri": "sqlite:////Users/aliouba/Documents/GitHub/BankChurn/mlflow.db"
     }
 }
